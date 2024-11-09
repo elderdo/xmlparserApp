@@ -1,0 +1,50 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35327.3
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xmlparser", "appxmlparser\appxmlparser.vcxproj", "{BE3877A4-11EB-40FE-A477-1377A5940030}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8D6DA009-FA73-4A74-8F24-949D668A6F3B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{3FE8365A-B79E-41BE-A737-33372E71CE47}"
+	ProjectSection(SolutionItems) = preProject
+		scripts\build.bat = scripts\build.bat
+		scripts\run.bat = scripts\run.bat
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".vscode", ".vscode", "{FAAD562B-BC8C-4237-B513-CE0F58C77EB6}"
+	ProjectSection(SolutionItems) = preProject
+		.vscode\launch.json = .vscode\launch.json
+		.vscode\tasks.json = .vscode\tasks.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "data", "data", "{73D4BC33-221C-4F6B-99C4-17912666AF75}"
+	ProjectSection(SolutionItems) = preProject
+		data\sample.xml = data\sample.xml
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BE3877A4-11EB-40FE-A477-1377A5940030}.Debug|x64.ActiveCfg = Debug|x64
+		{BE3877A4-11EB-40FE-A477-1377A5940030}.Debug|x64.Build.0 = Debug|x64
+		{BE3877A4-11EB-40FE-A477-1377A5940030}.Debug|x86.ActiveCfg = Debug|Win32
+		{BE3877A4-11EB-40FE-A477-1377A5940030}.Debug|x86.Build.0 = Debug|Win32
+		{BE3877A4-11EB-40FE-A477-1377A5940030}.Release|x64.ActiveCfg = Release|x64
+		{BE3877A4-11EB-40FE-A477-1377A5940030}.Release|x64.Build.0 = Release|x64
+		{BE3877A4-11EB-40FE-A477-1377A5940030}.Release|x86.ActiveCfg = Release|Win32
+		{BE3877A4-11EB-40FE-A477-1377A5940030}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D7CBF3DF-8047-4495-9BF3-7DFCA142D013}
+	EndGlobalSection
+EndGlobal
