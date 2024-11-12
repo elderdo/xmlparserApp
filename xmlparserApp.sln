@@ -22,6 +22,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "data", "data", "{73D4BC33-221C-4F6B-99C4-17912666AF75}"
 	ProjectSection(SolutionItems) = preProject
 		data\sample.xml = data\sample.xml
+		data\trace.txt = data\trace.txt
 	EndProjectSection
 EndProject
 Global
