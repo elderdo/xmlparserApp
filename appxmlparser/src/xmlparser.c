@@ -6,7 +6,8 @@
 #define _CRT_SECURE_NO_WARNINGS
 
 
-
+char sqlFileName[256];
+char logFileName[256];
 // Node structure
 typedef struct Node {
     char* tagname;
@@ -36,7 +37,9 @@ void addChild(Node* parent, Node* child) {
         parent->children = (Node**)realloc(parent->children, sizeof(Node*) * (parent->childCount + 1));
     }
     parent->children[parent->childCount++] = child;
+#ifdef DEBUG
     printf("Added child with tag %s to parent with tag %s. Total children: %d\n", child->tagname, parent->tagname, parent->childCount);
+#endif
 }
 
 
@@ -106,7 +109,7 @@ typedef struct PdmMaster {
 } PdmMaster;
 
 void logError(const char* message) {
-    FILE* logFile = fopen("errorLog.txt", "a");
+    FILE* logFile = fopen(logFileName, "a");
     if (logFile) {
         time_t now;
         time(&now);
@@ -144,7 +147,9 @@ void parseAttributes(char* attrs, Node* node) {
             size_t len = strlen(key) + strlen(value) + 4; // +4 for space, equals, and quotes
             char* attribute = (char*)malloc(len);
             snprintf(attribute, len, "%s=\"%s\"", key, value);
+#ifdef DEBUG
             printf("Parsed attribute: %s\n", attribute);
+#endif           
             if (node->attributes == NULL) {
                 node->attributes = attribute;
             }
@@ -177,7 +182,10 @@ char* handleEndTag(char* pos, Node** current, Node* parentStack[], int* stackInd
     if (*stackIndex > 0) {
         *current = parentStack[--(*stackIndex)];
     }
+#ifdef DEBUG
     printf("Moved back to parent node: %s\n", (*current)->tagname);
+
+#endif // DEBUG
     return pos;
 }
 
@@ -510,37 +518,13 @@ void generateInsertStatement(PdmMaster* pdmMaster, FILE* outputFile) {
     fprintf(outputFile, "%s\n", insertStatement);
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 int main(int argc, char** argv) {
-    if (argc != 2) {
-        fprintf(stderr, "Usage: %s <xml_file>\n", argv[0]);
+    if (argc != 4) {
+        fprintf(stderr, "Usage: %s <xml_file> <sql_file> <log_file>\n", argv[0]);
         return EXIT_FAILURE;
     }
-
+    strcpy_s(sqlFileName, sizeof(sqlFileName) - 1, argv[2]);
+    strcpy_s(logFileName, sizeof(logFileName) - 1,argv[3]);
     FILE* file = fopen(argv[1], "r");
     if (!file) {
         perror("Failed to open file");
@@ -565,7 +549,7 @@ int main(int argc, char** argv) {
     Node** foundNodes = searchNodes(root, "Product", "subType=\"BA6_Assembly\"", NULL, &count);
     if (foundNodes != NULL && count > 0) {
 		printf("Found %d Product nodes with subType=\"BA6_Assembly\".\n", count);
-        FILE* outputFile = fopen("insertData.sql", "w");
+        FILE* outputFile = fopen(sqlFileName, "w");
         if (outputFile != NULL) {
             for (int i = 0; i < count; ++i) {
                 PdmMaster pdmMaster = { 0 };
