@@ -4,9 +4,32 @@
 #include <time.h>
 #include <ctype.h>
 
+#ifndef _WIN32
+char* my_strdup(const char* str) {
+    if (str == NULL) {
+        return NULL;
+    }
+
+    // Allocate memory for the new string, including the null terminator
+    char* dup = malloc(strlen(str) + 1);
+
+    if (dup != NULL) {
+        // Copy the original string to the newly allocated memory
+        strcpy(dup, str);
+    }
+    else {
+        logError("Error: my_strdup: Memory allocation failed. Aborting");
+        exit(EXIT_FAILURE);
+    }
+
+    return dup;
+}
+#endif
+
 
 char sqlFileName[256];
 char logFileName[256];
+
 // Node structure
 typedef struct Node {
     char* tagname;
@@ -46,27 +69,6 @@ void logError(const char* message) {
     }
 }
 
-#ifndef _WIN32
-char* my_strdup(const char* str) {
-    if (str == NULL) {
-        return NULL;
-    }
-
-    // Allocate memory for the new string, including the null terminator
-    char* dup = malloc(strlen(str) + 1);
-
-    if (dup != NULL) {
-        // Copy the original string to the newly allocated memory
-        strcpy(dup, str);
-	}
-	else {
-		logError("Error: my_strdup: Memory allocation failed. Aborting");
-		exit(EXIT_FAILURE);
-	}
-
-    return dup;
-}
-#endif
 
 void addChild(Node* parent, Node* child) {
     if (parent->children == NULL) {
