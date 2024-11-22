@@ -1,54 +1,34 @@
-xmlparser.c: In function ‘createNode’:
-xmlparser.c:23:19: warning: assignment makes pointer from integer without a cast [enabled by default]
-     node->tagname = _strdup(tagname);
-                   ^
-xmlparser.c: In function ‘addNode’:
-xmlparser.c:130:26: warning: assignment from incompatible pointer type [enabled by default]
-         parent->children = child;
-                          ^
-xmlparser.c:133:25: warning: initialization from incompatible pointer type [enabled by default]
-         Node* sibling = parent->children;
-                         ^
+xmlparser.c: In function ‘logError’:
+xmlparser.c:8:27: error: ‘logFileName’ undeclared (first use in this function)
+     FILE* logFile = fopen(logFileName, "a");
+                           ^
+xmlparser.c:8:27: note: each undeclared identifier is reported only once for each function it appears in
 xmlparser.c: In function ‘parseAttributes’:
-xmlparser.c:143:18: warning: initialization makes pointer from integer without a cast [enabled by default]
-     char* attr = strtok_s(attrs, " ", &context);
+xmlparser.c:192:5: warning: implicit declaration of function ‘strtok_r’ [-Wimplicit-function-declaration]
+     char* attr = strtok_r(attrs, " ", &context);
+     ^
+xmlparser.c:192:18: warning: initialization makes pointer from integer without a cast [enabled by default]
+     char* attr = strtok_r(attrs, " ", &context);
                   ^
-xmlparser.c:146:21: warning: initialization makes pointer from integer without a cast [enabled by default]
-         char* key = strtok_s(attr, "=", &keyContext);
+xmlparser.c:195:21: warning: initialization makes pointer from integer without a cast [enabled by default]
+         char* key = strtok_r(attr, "=", &keyContext);
                      ^
-xmlparser.c:147:23: warning: initialization makes pointer from integer without a cast [enabled by default]
-         char* value = strtok_s(NULL, "\"", &keyContext);
+xmlparser.c:196:23: warning: initialization makes pointer from integer without a cast [enabled by default]
+         char* value = strtok_r(NULL, "\"", &keyContext);
                        ^
-xmlparser.c:166:14: warning: assignment makes pointer from integer without a cast [enabled by default]
-         attr = strtok_s(NULL, " ", &context);
+xmlparser.c:232:14: warning: assignment makes pointer from integer without a cast [enabled by default]
+         attr = strtok_r(NULL, " ", &context);
               ^
-xmlparser.c: In function ‘printTree’:
-xmlparser.c:290:13: error: ‘for’ loop initial declarations are only allowed in C99 mode
-             for (int i = 0; i < depth; i++) printf("  ");
-             ^
-xmlparser.c:290:13: note: use option -std=c99 or -std=gnu99 to compile your code
-xmlparser.c:295:13: error: ‘for’ loop initial declarations are only allowed in C99 mode
-             for (int i = 0; i < depth; i++) printf("  ");
-             ^
-xmlparser.c:299:9: error: ‘for’ loop initial declarations are only allowed in C99 mode
-         for (int i = 0; i < node->childCount; i++) {
-         ^
 xmlparser.c: In function ‘processUserValue’:
-xmlparser.c:370:18: warning: initialization makes pointer from integer without a cast [enabled by default]
-     char* attr = strtok_s(node->attributes, " ", &context);
-                  ^
-xmlparser.c:373:21: warning: initialization makes pointer from integer without a cast [enabled by default]
-         char* key = strtok_s(attr, "=", &keyContext);
-                     ^
-xmlparser.c:374:21: warning: initialization makes pointer from integer without a cast [enabled by default]
-         char* val = strtok_s(NULL, "\"", &keyContext);
-                     ^
-xmlparser.c:376:19: warning: assignment makes pointer from integer without a cast [enabled by default]
-             title = _strdup(val);
-                   ^
-xmlparser.c:379:19: warning: assignment makes pointer from integer without a cast [enabled by default]
-             value = _strdup(val);
-                   ^
-xmlparser.c:381:14: warning: assignment makes pointer from integer without a cast [enabled by default]
-         attr = strtok_s(NULL, " ", &context);
+xmlparser.c:451:15: warning: initialization makes pointer from integer without a cast [enabled by default]
+  char* attr = strtok_r(node->attributes, " ", &context);
+               ^
+xmlparser.c:454:15: warning: initialization makes pointer from integer without a cast [enabled by default]
+   char* key = strtok_r(attr, "=", &keyContext);
+               ^
+xmlparser.c:455:15: warning: initialization makes pointer from integer without a cast [enabled by default]
+   char* val = strtok_r(NULL, "\"", &keyContext);
+               ^
+xmlparser.c:472:14: warning: assignment makes pointer from integer without a cast [enabled by default]
+         attr = strtok_r(NULL, " ", &context);
               ^

@@ -4,6 +4,8 @@
 #include <time.h>
 #include <ctype.h>
 
+char logFileName[256];
+
 void logError(const char* message) {
     FILE* logFile = fopen(logFileName, "a");
     if (logFile) {
@@ -42,7 +44,6 @@ char* my_strdup(const char* str) {
 
 
 char sqlFileName[256];
-char logFileName[256];
 
 // Node structure
 typedef struct Node {
@@ -270,7 +271,7 @@ char* extractTagName(char* pos, char* tag, size_t tagSize) {
     return pos + tagLength + 1;
 }
 
-Node* createAndAddNode(Node** current, Node* parent, const char* tag) {
+Node* createAndAddNode(Node** current, const char* tag) {
     if (isValidTag(tag)) {
         Node* newNode = createNode(tag);
         addChild(*current, newNode);
@@ -313,7 +314,7 @@ char* processTag(char* pos, Node** current, Node* parentStack[], int* stackIndex
     pos = extractTagName(pos, tag, sizeof(tag));
     if (pos == NULL) return NULL;
 
-    Node* newNode = createAndAddNode(current, parentStack[*stackIndex - 1], tag);
+    Node* newNode = createAndAddNode(current, tag);
     if (newNode != NULL) {
         parentStack[(*stackIndex)++] = *current;
         *current = newNode; // Move to the new node
@@ -603,7 +604,7 @@ char* buildInsertStatement(PdmMaster* pdmMaster) {
 
 
 void generateInsertStatement(PdmMaster* pdmMaster, FILE* outputFile) {
-	int i = 0;
+	
     if (pdmMaster == NULL || outputFile == NULL) return;
 
     // Ensure item_id is always present
