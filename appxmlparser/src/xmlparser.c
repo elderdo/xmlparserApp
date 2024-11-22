@@ -20,7 +20,11 @@ typedef struct Node {
 
 Node* createNode(const char* tagname) {
     Node* node = (Node*)malloc(sizeof(Node));
+#ifdef _WIN32
     node->tagname = _strdup(tagname);
+#else
+	node->tagname = strdup(tagname);
+#endif
     node->attributes = NULL;
     node->content = NULL;
     node->children = NULL;
@@ -29,12 +33,37 @@ Node* createNode(const char* tagname) {
     return node;
 }
 
+void logError(const char* message) {
+    FILE* logFile = fopen(logFileName, "a");
+    if (logFile) {
+        time_t now;
+        time(&now);
+        struct tm* local = localtime(&now);
+        fprintf(logFile, "[%04d-%02d-%02d %02d:%02d:%02d] %s\n",
+            local->tm_year + 1900, local->tm_mon + 1, local->tm_mday,
+            local->tm_hour, local->tm_min, local->tm_sec, message);
+        fclose(logFile);
+    }
+}
+
 void addChild(Node* parent, Node* child) {
     if (parent->children == NULL) {
         parent->children = (Node**)malloc(sizeof(Node*));
+        if (parent->children == NULL) {
+            // Handle memory allocation failure
+            fprintf(stderr, "Memory allocation failed\n");
+            exit(EXIT_FAILURE);
+        }
     }
     else {
-        parent->children = (Node**)realloc(parent->children, sizeof(Node*) * (parent->childCount + 1));
+        Node** temp = (Node**)realloc(parent->children, sizeof(Node*) * (parent->childCount + 1));
+        if (temp == NULL) {
+			char logMessage[256];
+			sprintf(logMessage, "Memory allocation failed at %d of %s - aborting\n", __LINE__, __FILE__);
+            logError(logMessage);
+            exit(EXIT_FAILURE);
+        }
+        parent->children = temp;
     }
     parent->children[parent->childCount++] = child;
 #ifdef DEBUG
@@ -110,60 +139,73 @@ typedef struct PdmMaster {
     char* comments;
 } PdmMaster;
 
-void logError(const char* message) {
-    FILE* logFile = fopen(logFileName, "a");
-    if (logFile) {
-        time_t now;
-        time(&now);
-        struct tm* local = localtime(&now);
-        fprintf(logFile, "[%04d-%02d-%02d %02d:%02d:%02d] %s\n",
-            local->tm_year + 1900, local->tm_mon + 1, local->tm_mday,
-            local->tm_hour, local->tm_min, local->tm_sec, message);
-        fclose(logFile);
-    }
-}
 
 
 
 void addNode(Node* parent, Node* child) {
     if (parent->children == NULL) {
-        parent->children = child;
+        parent->children = (Node**)malloc(sizeof(Node*));
     }
     else {
-        Node* sibling = parent->children;
-        while (sibling->next != NULL) {
-            sibling = sibling->next;
-        }
-        sibling->next = child;
+        parent->children = (Node**)realloc(parent->children, sizeof(Node*) * (parent->childCount + 1));
     }
+    parent->children[parent->childCount++] = child;
+#ifdef DEBUG
+    printf("Added child with tag %s to parent with tag %s. Total children: %d\n", child->tagname, parent->tagname, parent->childCount);
+#endif
 }
 
 void parseAttributes(char* attrs, Node* node) {
     char* context = NULL;
+#ifdef _WIN32
     char* attr = strtok_s(attrs, " ", &context);
     while (attr) {
         char* keyContext = NULL;
         char* key = strtok_s(attr, "=", &keyContext);
         char* value = strtok_s(NULL, "\"", &keyContext);
+#else
+    char* attr = strtok_r(attrs, " ", &context);
+    while (attr) {
+        char* keyContext = NULL;
+        char* key = strtok_r(attr, "=", &keyContext);
+        char* value = strtok_r(NULL, "\"", &keyContext);
+#endif
         if (value) {
             size_t len = strlen(key) + strlen(value) + 4; // +4 for space, equals, and quotes
             char* attribute = (char*)malloc(len);
             snprintf(attribute, len, "%s=\"%s\"", key, value);
 #ifdef DEBUG
             printf("Parsed attribute: %s\n", attribute);
-#endif           
+#endif
             if (node->attributes == NULL) {
                 node->attributes = attribute;
-            }
-            else {
+            } else {
                 size_t new_len = strlen(node->attributes) + len + 1;
-                node->attributes = (char*)realloc(node->attributes, new_len);
-                strcat_s(node->attributes, new_len, " ");
-                strcat_s(node->attributes, new_len, attribute);
+                char* temp = (char*)realloc(node->attributes, new_len);
+                if (temp == NULL) {
+					char logMessage[256];
+					sprintf(logMessage, "Memory allocation failed at %d of %s - aborting\n", __LINE__, __FILE__);
+                    logError(logMessage);
+                    exit(EXIT_FAILURE);
+                }
+                node->attributes = temp;
+                strncat(node->attributes, " ", new_len - strlen(node->attributes) - 1);
+                if (attribute != NULL) {
+                    strncat(node->attributes, attribute, new_len - strlen(node->attributes) - 1);
+                }
+                else {
+#ifdef DEBUG
+                    printf("Warning: attribute is NULL, cannot concatenate to node->attributes\n");
+#endif
+                }
                 free(attribute);
             }
         }
+#ifdef _WIN32
         attr = strtok_s(NULL, " ", &context);
+#else
+        attr = strtok_r(NULL, " ", &context);
+#endif
     }
 }
 
@@ -219,7 +261,15 @@ void processAttributes(char* attrs, Node* current) {
     if (endAttrs) {
         size_t attrsLength = endAttrs - attrs;
         char* attrString = (char*)malloc(attrsLength + 1);
-        strncpy_s(attrString, attrsLength + 1, attrs, attrsLength);
+        if (attrString != NULL) {
+            strncpy_s(attrString, attrsLength + 1, attrs, attrsLength);
+        }
+        else {
+			char logMessage[256];
+			sprintf(logMessage, "Error: processAttributes: Memory allocation for attrString failed at %d of %s - aborting\n", __LINE__, __FILE__);
+            logError(logMessage);
+			exit(EXIT_FAILURE);
+        }
         attrString[attrsLength] = '\0'; // Null-terminate the attribute string
         parseAttributes(attrString, current);
         free(attrString);
@@ -261,8 +311,7 @@ void parseXML(char* xmlContent, Node* parent) {
 
     printf("Starting XML parsing...\n");
     while ((pos = strstr(pos, "<")) != NULL) {
-        printf("Processing tag starting at position: %ld\n", pos - xmlContent);
-
+        printf("Processing tag starting at position: %lld\n", (long long int)(pos - xmlContent));
         if (strncmp(pos, "<!--", 4) == 0) {
             pos = handleComments(pos);
         }
@@ -367,11 +416,20 @@ void processUserValue(Node* node, PdmMaster* pdmMaster) {
     char* title = NULL;
     char* value = NULL;
     char* context = NULL;
+#ifdef _WIN32
     char* attr = strtok_s(node->attributes, " ", &context);
     while (attr) {
         char* keyContext = NULL;
         char* key = strtok_s(attr, "=", &keyContext);
         char* val = strtok_s(NULL, "\"", &keyContext);
+#else
+	char* attr = strtok_r(node->attributes, " ", &context);
+	while (attr) {
+		char* keyContext = NULL;
+		char* key = strtok_r(attr, "=", &keyContext);
+		char* val = strtok_r(NULL, "\"", &keyContext);
+#endif
+#ifdef _WIN32
         if (strcmp(key, "title") == 0) {
             title = _strdup(val);
         }
@@ -379,6 +437,15 @@ void processUserValue(Node* node, PdmMaster* pdmMaster) {
             value = _strdup(val);
         }
         attr = strtok_s(NULL, " ", &context);
+#else
+        if (strcmp(key, "title") == 0) {
+            title = strdup(val);
+    }
+        else if (strcmp(key, "value") == 0) {
+            value = strdup(val);
+        }
+        attr = strtok_r(NULL, " ", &context);
+#endif
     }
 
     if (title != NULL && value != NULL) {
@@ -542,7 +609,16 @@ int main(int argc, char** argv) {
     long fileSize = ftell(file);
     fseek(file, 0, SEEK_SET);
     char* buffer = (char*)malloc(fileSize + 1);
-    fread(buffer, 1, fileSize, file);
+    if (buffer != NULL) {
+        fread(buffer, 1, fileSize, file);
+    }
+    else {
+		char errorMessage[256];
+		snprintf(errorMessage, sizeof(errorMessage),
+			"Error: main: Memory allocation for buffer failed at %d of %s - aborting\n", __LINE__, __FILE__);
+		logError(errorMessage);
+        exit(EXIT_FAILURE);
+    }
     buffer[fileSize] = '\0';
     fclose(file);
 
