@@ -3,7 +3,6 @@
 #include <string.h>
 #include <time.h>
 #include <ctype.h>
-#define _CRT_SECURE_NO_WARNINGS
 
 
 char sqlFileName[256];
@@ -17,6 +16,7 @@ typedef struct Node {
     int childCount;          // Number of children
     struct Node* next;
 } Node;
+
 
 Node* createNode(const char* tagname) {
     Node* node = (Node*)malloc(sizeof(Node));
@@ -44,7 +44,8 @@ void addChild(Node* parent, Node* child) {
 
 
 int my_strncasecmp(const char* s1, const char* s2, size_t n) {
-    for (size_t i = 0; i < n; i++) {
+	size_t i = 0;
+    for (i = 0; i < n; i++) {
         if (tolower((unsigned char)s1[i]) != tolower((unsigned char)s2[i])) {
             return (unsigned char)s1[i] - (unsigned char)s2[i];
         }
@@ -56,6 +57,7 @@ int my_strncasecmp(const char* s1, const char* s2, size_t n) {
 }
 
 int isValidTag(const char* tag) {
+	const char* p = tag;
     if (tag == NULL || strlen(tag) == 0) return 0;
 
     // Check if the tag starts with a letter or underscore
@@ -65,7 +67,7 @@ int isValidTag(const char* tag) {
     if (my_strncasecmp(tag, "xml", 3) == 0) return 0;
 
     // Check if the tag contains only valid characters
-    for (const char* p = tag; *p; ++p) {
+    for (p = tag; *p; ++p) {
         if (!(isalnum(*p) || *p == '-' || *p == '_' || *p == '.')) {
             return 0;
         }
@@ -279,8 +281,9 @@ void parseXML(char* xmlContent, Node* parent) {
 }
 
 void printTree(Node* node, int depth) {
+    int i = 0;
     while (node) {
-        for (int i = 0; i < depth; i++) printf("  ");
+        for (i = 0; i < depth; i++) printf("  ");
         printf("Tag: %s\n", node->tagname);
 
         if (node->attributes) {
@@ -303,6 +306,7 @@ void printTree(Node* node, int depth) {
 
 // Function to search for nodes with the specified tag and attribute, and return a list of matching nodes
 Node** searchNodes(Node* root, const char* tagname, const char* attribute, const char* value, int* count) {
+	int i = 0;
     if (root == NULL) return NULL;
 
     int capacity = 10;
@@ -338,7 +342,7 @@ Node** searchNodes(Node* root, const char* tagname, const char* attribute, const
         if (current->next) stack[stackIndex++] = current->next;
 
         if (current->children) {
-            for (int i = 0; i < current->childCount; i++) {
+            for (i = 0; i < current->childCount; i++) {
                 if (current->children[i]) {
                     if (stackIndex >= stackCapacity) {
                         stackCapacity *= 2;
@@ -396,13 +400,14 @@ void processUserValue(Node* node, PdmMaster* pdmMaster) {
 }
 
 void traverseNodes(Node* node, PdmMaster* pdmMaster) {
+    int i = 0;
     if (node == NULL) return;
 
     if (strcmp(node->tagname, "UserValue") == 0) {
         processUserValue(node, pdmMaster);
     }
 
-    for (int i = 0; i < node->childCount; i++) {
+    for (i = 0; i < node->childCount; i++) {
         traverseNodes(node->children[i], pdmMaster);
     }
 }
@@ -440,7 +445,7 @@ char* toDate(const char* date) {
     }
     else {
         sql = (char*)malloc(67);
-        sprintf_s(sql, 67, "TO_DATE('%s', 'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"')", date);
+        snprintf(sql, 67, "TO_DATE('%s', 'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"')", date);
     }
     return sql;
 }
@@ -506,6 +511,7 @@ char* buildInsertStatement(PdmMaster* pdmMaster) {
 
 
 void generateInsertStatement(PdmMaster* pdmMaster, FILE* outputFile) {
+	int i = 0;
     if (pdmMaster == NULL || outputFile == NULL) return;
 
     // Ensure item_id is always present
@@ -519,6 +525,7 @@ void generateInsertStatement(PdmMaster* pdmMaster, FILE* outputFile) {
 }
 
 int main(int argc, char** argv) {
+	int i = 0;
     if (argc != 4) {
         fprintf(stderr, "Usage: %s <xml_file> <sql_file> <log_file>\n", argv[0]);
         return EXIT_FAILURE;
@@ -551,7 +558,7 @@ int main(int argc, char** argv) {
 		printf("Found %d Product nodes with subType=\"BA6_Assembly\".\n", count);
         FILE* outputFile = fopen(sqlFileName, "w");
         if (outputFile != NULL) {
-            for (int i = 0; i < count; ++i) {
+            for (i = 0; i < count; ++i) {
                 PdmMaster pdmMaster = { 0 };
                 fetchNodeAttributes(foundNodes[i], &pdmMaster);
 
