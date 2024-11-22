@@ -23,7 +23,7 @@ Node* createNode(const char* tagname) {
 #ifdef _WIN32
     node->tagname = _strdup(tagname);
 #else
-	node->tagname = strdup(tagname);
+	node->tagname = my_strdup(tagname);
 #endif
     node->attributes = NULL;
     node->content = NULL;
@@ -45,6 +45,28 @@ void logError(const char* message) {
         fclose(logFile);
     }
 }
+
+#ifndef _WIN32
+char* my_strdup(const char* str) {
+    if (str == NULL) {
+        return NULL;
+    }
+
+    // Allocate memory for the new string, including the null terminator
+    char* dup = malloc(strlen(str) + 1);
+
+    if (dup != NULL) {
+        // Copy the original string to the newly allocated memory
+        strcpy(dup, str);
+	}
+	else {
+		logError("Error: my_strdup: Memory allocation failed. Aborting");
+		exit(EXIT_FAILURE);
+	}
+
+    return dup;
+}
+#endif
 
 void addChild(Node* parent, Node* child) {
     if (parent->children == NULL) {
@@ -439,10 +461,10 @@ void processUserValue(Node* node, PdmMaster* pdmMaster) {
         attr = strtok_s(NULL, " ", &context);
 #else
         if (strcmp(key, "title") == 0) {
-            title = strdup(val);
+            title = my_strdup(val);
     }
         else if (strcmp(key, "value") == 0) {
-            value = strdup(val);
+            value = my_strdup(val);
         }
         attr = strtok_r(NULL, " ", &context);
 #endif
