@@ -4,6 +4,20 @@
 #include <time.h>
 #include <ctype.h>
 
+void logError(const char* message) {
+    FILE* logFile = fopen(logFileName, "a");
+    if (logFile) {
+        time_t now;
+        time(&now);
+        struct tm* local = localtime(&now);
+        fprintf(logFile, "[%04d-%02d-%02d %02d:%02d:%02d] %s\n",
+            local->tm_year + 1900, local->tm_mon + 1, local->tm_mday,
+            local->tm_hour, local->tm_min, local->tm_sec, message);
+        fclose(logFile);
+    }
+}
+
+
 #ifndef _WIN32
 char* my_strdup(const char* str) {
     if (str == NULL) {
@@ -54,19 +68,6 @@ Node* createNode(const char* tagname) {
     node->childCount = 0;
     node->next = NULL;
     return node;
-}
-
-void logError(const char* message) {
-    FILE* logFile = fopen(logFileName, "a");
-    if (logFile) {
-        time_t now;
-        time(&now);
-        struct tm* local = localtime(&now);
-        fprintf(logFile, "[%04d-%02d-%02d %02d:%02d:%02d] %s\n",
-            local->tm_year + 1900, local->tm_mon + 1, local->tm_mday,
-            local->tm_hour, local->tm_min, local->tm_sec, message);
-        fclose(logFile);
-    }
 }
 
 
