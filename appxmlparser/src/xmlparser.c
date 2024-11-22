@@ -240,7 +240,7 @@ char* extractTagName(char* pos, char* tag, size_t tagSize) {
         printf("Tag name too long, exiting.\n");
         return NULL;
     }
-    strncpy_s(tag, tagSize, pos + 1, tagLength);
+    strncpy(tag,pos + 1, tagLength);
     tag[tagLength] = '\0'; // Null-terminate the tag string
     return pos + tagLength + 1;
 }
@@ -262,7 +262,7 @@ void processAttributes(char* attrs, Node* current) {
         size_t attrsLength = endAttrs - attrs;
         char* attrString = (char*)malloc(attrsLength + 1);
         if (attrString != NULL) {
-            strncpy_s(attrString, attrsLength + 1, attrs, attrsLength);
+            strncpy(attrString, attrs, attrsLength);
         }
         else {
 			char logMessage[256];
@@ -597,8 +597,8 @@ int main(int argc, char** argv) {
         fprintf(stderr, "Usage: %s <xml_file> <sql_file> <log_file>\n", argv[0]);
         return EXIT_FAILURE;
     }
-    strcpy_s(sqlFileName, sizeof(sqlFileName) - 1, argv[2]);
-    strcpy_s(logFileName, sizeof(logFileName) - 1,argv[3]);
+    strncpy(sqlFileName, argv[2],sizeof(sqlFileName) - 1);
+    strncpy(logFileName, argv[3],sizeof(logFileName) - 1);
     FILE* file = fopen(argv[1], "r");
     if (!file) {
         perror("Failed to open file");
