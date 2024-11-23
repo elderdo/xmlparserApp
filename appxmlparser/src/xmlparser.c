@@ -5,6 +5,7 @@
 #include <ctype.h>
 
 char logFileName[256];
+int insertStatementCount = 0;
 
 void logError(const char* message) {
     FILE* logFile = fopen(logFileName, "a");
@@ -263,8 +264,10 @@ char* handleEndTag(char* pos, Node** current, Node* parentStack[], int* stackInd
 char* extractTagName(char* pos, char* tag, size_t tagSize) {
     size_t tagLength = strcspn(pos + 1, " >");
     if (tagLength >= tagSize) {
-        printf("Tag name too long, exiting.\n");
-        return NULL;
+		char logMessage[256];
+        sprintf(logMessage,"extractTagName: Tag name too long, exiting. at %d for %s\n",__LINE__,__FILE__);
+		logError(logMessage);
+		exit(EXIT_FAILURE);
     }
     strncpy(tag,pos + 1, tagLength);
     tag[tagLength] = '\0'; // Null-terminate the tag string
@@ -275,7 +278,9 @@ Node* createAndAddNode(Node** current, const char* tag) {
     if (isValidTag(tag)) {
         Node* newNode = createNode(tag);
         addChild(*current, newNode);
+#ifdef DEBUG
         printf("Created node with tag: %s\n", tag);
+#endif
         return newNode;
     }
     return NULL;
@@ -318,7 +323,9 @@ char* processTag(char* pos, Node** current, Node* parentStack[], int* stackIndex
     if (newNode != NULL) {
         parentStack[(*stackIndex)++] = *current;
         *current = newNode; // Move to the new node
+#ifdef DEBUG
         printf("Current node tag: %s\n", (*current)->tagname);
+#endif
         processAttributes(pos, *current);
         char* endAttrs = strstr(pos, ">");
         if (endAttrs) {
@@ -334,10 +341,13 @@ void parseXML(char* xmlContent, Node* parent) {
     Node* parentStack[100];
     int stackIndex = 0;
     parentStack[stackIndex++] = parent;
-
+#ifdef DEBUG
     printf("Starting XML parsing...\n");
+#endif
     while ((pos = strstr(pos, "<")) != NULL) {
+#ifdef DEBUG
         printf("Processing tag starting at position: %lld\n", (long long int)(pos - xmlContent));
+#endif
         if (strncmp(pos, "<!--", 4) == 0) {
             pos = handleComments(pos);
         }
@@ -359,16 +369,21 @@ void printTree(Node* node, int depth) {
     int i = 0;
     while (node) {
         for (i = 0; i < depth; i++) printf("  ");
+#ifdef DEBUG
         printf("Tag: %s\n", node->tagname);
-
+#endif  
         if (node->attributes) {
             for (int i = 0; i < depth; i++) printf("  ");
+#ifdef DEBUG
             printf("Attributes: %s\n", node->attributes);
+#endif
         }
 
         if (node->content) {
             for (int i = 0; i < depth; i++) printf("  ");
+#ifdef DEBUG
             printf("Content: %s\n", node->content);
+#endif
         }
 
         for (int i = 0; i < node->childCount; i++) {
@@ -615,6 +630,7 @@ void generateInsertStatement(PdmMaster* pdmMaster, FILE* outputFile) {
 
     char* insertStatement = buildInsertStatement(pdmMaster);
     fprintf(outputFile, "%s\n", insertStatement);
+	++insertStatementCount;
 }
 
 int main(int argc, char** argv) {
@@ -674,6 +690,17 @@ int main(int argc, char** argv) {
                     logError(errorMessage);
                 }
             }
+			if (insertStatementCount > 0) {
+				char logMessage[256];
+				sprintf(logMessage, "Insert statements generated successfully. Total insert statements: %d", insertStatementCount); 
+				logError(logMessage);
+				printf(logMessage);
+                fprintf(outputFile, "COMMIT;\n");
+                fprintf(outputFile, "EXIT;\n");
+			}
+			else {
+				logError("No insert statements generated.");
+			}
             fclose(outputFile);
         }
         free(foundNodes);
