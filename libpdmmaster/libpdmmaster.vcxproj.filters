@@ -15,14 +15,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\xmlparser.c">
+    <ClInclude Include="include\pdm_master.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\pdm_master.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="scripts\Makefile" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="scripts\tee.bat" />
   </ItemGroup>
 </Project>

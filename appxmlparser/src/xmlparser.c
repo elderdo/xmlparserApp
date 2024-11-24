@@ -369,21 +369,15 @@ void printTree(Node* node, int depth) {
     int i = 0;
     while (node) {
         for (i = 0; i < depth; i++) printf("  ");
-#ifdef DEBUG
         printf("Tag: %s\n", node->tagname);
-#endif  
         if (node->attributes) {
             for (int i = 0; i < depth; i++) printf("  ");
-#ifdef DEBUG
             printf("Attributes: %s\n", node->attributes);
-#endif
         }
 
         if (node->content) {
             for (int i = 0; i < depth; i++) printf("  ");
-#ifdef DEBUG
             printf("Content: %s\n", node->content);
-#endif
         }
 
         for (int i = 0; i < node->childCount; i++) {
@@ -643,7 +637,9 @@ int main(int argc, char** argv) {
     strncpy(logFileName, argv[3],sizeof(logFileName) - 1);
     FILE* file = fopen(argv[1], "r");
     if (!file) {
-        perror("Failed to open file");
+        char errorMsg[256];
+        sprintf(errorMsg, "Failed to open file: %s", argv[1]);
+        perror(errorMsg);
         return EXIT_FAILURE;
     }
 
