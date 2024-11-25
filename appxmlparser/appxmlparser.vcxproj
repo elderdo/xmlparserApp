@@ -145,7 +145,12 @@
     <EmbeddedResource Include="scripts\Makefile" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="scripts\tee.bat" />
+    <None Include="..\..\..\C#\MdDocsOfCopilotQnA\docs\C\makefile.md" />
+    <None Include="..\..\..\C#\MdDocsOfCopilotQnA\docs\Linux\cshellprofilescript.md" />
+    <None Include="..\..\..\C#\MdDocsOfCopilotQnA\docs\Linux\korn2cshell.md" />
+    <None Include="docs\cshellprofilescript.md" />
+    <None Include="docs\korn2cshell.md" />
+    <None Include="docs\makefile.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

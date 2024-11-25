@@ -23,6 +23,11 @@
     <EmbeddedResource Include="scripts\Makefile" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="scripts\tee.bat" />
+    <None Include="..\..\..\C#\MdDocsOfCopilotQnA\docs\Linux\korn2cshell.md" />
+    <None Include="..\..\..\C#\MdDocsOfCopilotQnA\docs\Linux\cshellprofilescript.md" />
+    <None Include="docs\cshellprofilescript.md" />
+    <None Include="docs\korn2cshell.md" />
+    <None Include="..\..\..\C#\MdDocsOfCopilotQnA\docs\C\makefile.md" />
+    <None Include="docs\makefile.md" />
   </ItemGroup>
 </Project>
