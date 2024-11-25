@@ -152,6 +152,9 @@
     <None Include="docs\korn2cshell.md" />
     <None Include="docs\makefile.md" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="scripts\dos2unix.sh" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

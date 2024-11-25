@@ -30,4 +30,7 @@
     <None Include="..\..\..\C#\MdDocsOfCopilotQnA\docs\C\makefile.md" />
     <None Include="docs\makefile.md" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="scripts\dos2unix.sh" />
+  </ItemGroup>
 </Project>

@@ -1,4 +1,8 @@
 ﻿# Variables
+# csh C compiler for csh
+# CC = cc
+# C compiler options for csh
+# CFLAGS = -xc99 -O2
 CC = gcc
 CFLAGS = -std=c99 -D_POSIX_C_SOURCE=200809L -Wall -Wextra -O2
 TARGET = xmlparser
